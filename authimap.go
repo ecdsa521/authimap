@@ -41,6 +41,7 @@ func request(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 		if err != nil { //server problem
 			cache[user+password] = 403
 			w.WriteHeader(403)
+
 			return
 		}
 		if c.Caps["STARTTLS"] {
@@ -61,7 +62,8 @@ func request(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 
 	} else {
 		//no password supplied - restart with auth request
-		w.WriteHeader(401)
+		w.Header().Set("WWW-Authenticate", "Basic realm=Restricted")
+		http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
 	}
 
 }
